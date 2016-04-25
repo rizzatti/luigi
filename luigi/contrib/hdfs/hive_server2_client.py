@@ -24,7 +24,7 @@ class HiveServer2HdfsClient(hdfs_abstract_client.HdfsFileSystem):
         if hasattr(self, '_conn'):
             return self._conn
         from pyhive import hive
-        self.conn = hive.connect(host=self._host, port=self._port, username=self._username, database=self._database)
+        self._conn = hive.connect(host=self._host, port=self._port, username=self._username, database=self._database)
         return self._conn
 
     def cursor(self):
