@@ -38,6 +38,58 @@ class HiveServer2HdfsClient(hdfs_abstract_client.HdfsFileSystem):
         except OperationalError:
             return False
 
+    def move(self, source, destination):
+        from pyhive.exc import OperationalError
+        try:
+            if not isinstance(source, (list, tuple)):
+                source = [source]
+            self.cursor().execute('dfs -mv {} {}'.format(' '.join(source), destination))
+            return True
+        except OperationalError:
+            return False
+
+    def remove(self, path, recursrive=True, skip_trash=False):
+        from pyhive.exc import OperationalError
+        try:
+            recursive_arg = '-r' if recursive else ''
+            skip_arg = '-skipTrash' if skip_trash else ''
+            self.cursor().execute('dfs -rm {} {} {}'.format(recursive_arg, skip_arg, path))
+            return True
+        except OperationalError:
+            return False
+
+    def chmod(self, path, permissions, recursive=False):
+        from pyhive.exc import OperationalError
+        try:
+            recursive_arg = '-R' if recursive else ''
+            self.cursor().execute('dfs -chmod {} {} {}'.format(recursive_arg, permissions, path))
+            return True
+        except OperationalError:
+            return False
+
+    def chown(self, path, owner, group, recursive=False):
+        from pyhive.exc import OperationalError
+        try:
+            recursive_arg = '-R' if recursive else ''
+            owner = '' if owner is None else owner
+            group = '' if group is None else group
+            ownership = '{}:{}'.format(owner, group)
+            self.cursor().execute('dfs -chmod {} {} {}'.format(recursive_arg, ownership, path))
+            return True
+        except OperationalError:
+            return False
+
+    def count(self, path):
+        raise NotImplementedError("HiveServer2 in luigi doesn't implement count")
+
+    def copy(self, source, destination):
+        from pyhive.exc import OperationalError
+        try:
+            self.cursor().execute('dfs -cp {} {}'.format(source, destination))
+            return True
+        except OperationalError:
+            return False
+
     def put(self, source, destination):
         from pyhive.exc import OperationalError
         try:
@@ -59,6 +111,18 @@ class HiveServer2HdfsClient(hdfs_abstract_client.HdfsFileSystem):
         try:
             parent_arg = "-p" if parents else ""
             self.cursor().execute('dfs -mkdir {} {}'.format(parent_arg, path))
+            return True
+        except OperationalError:
+            return False
+
+    def listdir(self, path, ignore_directories=False, ignore_files=False,
+                include_size=False, include_type=False, include_time=False, recursive=False):
+        raise NotImplementedError("HiveServer2 in luigi doesn't implement count")
+
+    def touchz(self, path):
+        from pyhive.exc import OperationalError
+        try:
+            self.cursor().execute('dfs -touchz {}'.format(path))
             return True
         except OperationalError:
             return False
