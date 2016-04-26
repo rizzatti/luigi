@@ -33,7 +33,7 @@ class HiveServer2HdfsClient(hdfs_abstract_client.HdfsFileSystem):
     def exists(self, path):
         from pyhive.exc import OperationalError
         try:
-            self.cursor().execute('dfs -stat -e {}'.format(path))
+            self.cursor().execute('dfs -stat {}'.format(path))
             return True
         except OperationalError:
             return False
