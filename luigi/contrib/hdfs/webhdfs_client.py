@@ -152,7 +152,7 @@ class WebHdfsClient(hdfs_abstract_client.HdfsFileSystem):
         """
         Restricted version of upload
         """
-        self.upload(local_path, destination)
+        self.upload(destination, local_path)
 
     def get(self, path, local_destination):
         """
