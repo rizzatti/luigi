@@ -85,6 +85,8 @@ class WebHdfsClient(hdfs_abstract_client.HdfsFileSystem):
         except hdfs.util.HdfsError as e:
             if str(e).startswith('File does not exist: '):
                 return False
+            elif str(e).endswith('does not exist.'):
+                return False
             else:
                 raise e
 
