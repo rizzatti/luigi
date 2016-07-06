@@ -3,6 +3,7 @@
 import luigi
 from luigi.contrib.hdfs import abstract_client as hdfs_abstract_client
 from luigi.contrib.hdfs import config as hdfs_config
+from luigi.target import FileAlreadyExists
 
 
 class hiveserver2(luigi.Config):
@@ -106,13 +107,15 @@ class HiveServer2HdfsClient(hdfs_abstract_client.HdfsFileSystem):
         except OperationalError:
             return False
 
-    def mkdir(self, path, parents=True):
+    def mkdir(self, path, parents=True, raise_if_exists=False):
         from pyhive.exc import OperationalError
         try:
             parent_arg = "-p" if parents else ""
             self.cursor().execute('dfs -mkdir {} {}'.format(parent_arg, path))
             return True
-        except OperationalError:
+        except OperationalError as e:
+            if raise_if_exists:
+                raise FileAlreadyExists(e.stderr)
             return False
 
     def listdir(self, path, ignore_directories=False, ignore_files=False,
