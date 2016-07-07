@@ -49,6 +49,9 @@ class HiveServer2HdfsClient(hdfs_abstract_client.HdfsFileSystem):
         except OperationalError:
             return False
 
+    def rename(self, source, destination):
+        return self.move(source, destination)
+
     def remove(self, path, recursrive=True, skip_trash=False):
         from pyhive.exc import OperationalError
         try:
