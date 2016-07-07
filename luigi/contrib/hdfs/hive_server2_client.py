@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import os
+
 import luigi
 from luigi.contrib.hdfs import abstract_client as hdfs_abstract_client
 from luigi.contrib.hdfs import config as hdfs_config
@@ -44,6 +46,8 @@ class HiveServer2HdfsClient(hdfs_abstract_client.HdfsFileSystem):
         try:
             if not isinstance(source, (list, tuple)):
                 source = [source]
+            parent_dir = os.path.dirname(destination)
+            self.mkdir(parent_dir, parents=True, raise_if_exists=False)
             self.cursor().execute('dfs -mv {} {}'.format(' '.join(source), destination))
             return True
         except OperationalError:
